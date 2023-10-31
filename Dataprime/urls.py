@@ -20,9 +20,14 @@ from core.views import *
 from rest_framework import routers
 
 router = routers.DefaultRouter()
-router.register(r'clasificaciones', ClasificacionRetrieveUpdateDestroyView, 'clasificaciones')
-router.register(r'tipo-de-entidad', TipoDeEntidadRetrieveUpdateDestroyView, 'tipoDeEntidad')
+router.register(r'clasificacion', ClasificacionRetrieveUpdateDestroyView, 'clasificacion')
 router.register(r'termino', TerminoRetrieveUpdateDestroyView, 'termino')
+router.register(r'indicador', IndicadorRetrieveUpdateDestroyView, 'indicador')
+router.register(r'base-de-datos', BaseDeDatosRetrieveUpdateDestroyView, 'base-de-datos')
+router.register(r'tabla', TablaRetrieveUpdateDestroyView, 'tabla')
+router.register(r'columna', ColumnaRetrieveUpdateDestroyView, 'columna')
+router.register(r'visualizacion', VisualizacionRetrieveUpdateDestroyView, 'visualizacion')
+router.register(r'proceso', ProcesoRetrieveUpdateDestroyView, 'proceso')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
