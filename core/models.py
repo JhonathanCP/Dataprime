@@ -87,8 +87,8 @@ class Proceso(models.Model):
     descripcion = models.TextField(null=True, blank=True)
     fechaCreacion = models.DateTimeField(auto_now_add=True)
     fechaActualizacion = models.DateTimeField(auto_now=True)
-    tablasDeEntrada = models.ManyToManyField(Tabla, blank=True)
-    tablasDeSalida = models.ManyToManyField(Tabla, blank=True)
+    tablasDeEntrada = models.ManyToManyField(Tabla, related_name='tablas_entrada', blank=True)
+    tablasDeSalida = models.ManyToManyField(Tabla, related_name='tablas_salida', blank=True)
     clasificaciones = models.ManyToManyField(Clasificacion, blank=True)
     
     def __str__(self):

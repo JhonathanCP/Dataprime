@@ -14,13 +14,13 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from core import views
 from core.views import *
 from rest_framework import routers
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from authentication.views import UserListView, UserDetailView
-from authentication.views import UserRegistrationView, UserUpdateRoleView, CustomTokenObtainPairView
+from authentication.views import UserRegistrationView, UserUpdateRoleView, CustomTokenObtainPairView, UserAddClasificacion
 
 router = routers.DefaultRouter()
 router.register(r'clasificacion', ClasificacionRetrieveUpdateDestroyView, 'clasificacion')
@@ -33,11 +33,19 @@ router.register(r'visualizacion', VisualizacionRetrieveUpdateDestroyView, 'visua
 router.register(r'proceso', ProcesoRetrieveUpdateDestroyView, 'proceso')
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('api/', include(router.urls)),
     path('login/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('register/', UserRegistrationView.as_view(), name='user-registration'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('users/', UserListView.as_view(), name='user-list'),
     path('users/<int:pk>/update-role/', UserUpdateRoleView.as_view(), name='user-update-role'),
     path('users/<int:pk>/', UserDetailView.as_view(), name='user-detail'),
+    path('users/<int:user_id>/add-clasificacion/<int:clasificacion_id>/', UserAddClasificacion.as_view(), name='user-add-clasificacion'),
+    path('api/fill-entities-from-db/', FillEntitiesFromDB.as_view(), name='fill-entities-from-db'),
+    path('api/column-info/<int:id>/', ColumnView.as_view(), name='column-info'),
+    path('api/table-info/<int:id>/', TableView.as_view(), name='table-info'),
+    path('api/add-inputTable/<int:id>/', AddInputTable.as_view(), name='add-inputTable'),
+    path('api/remove-inputTable/<int:id>/', RemoveInputTable.as_view(), name='remove-inputTable'),
+    path('api/add-outputTable/<int:id>/', AddOutputTable.as_view(), name='add-outputTable'),
+    path('api/remove-outputTable/<int:id>/', RemoveOutputTable.as_view(), name='remove-outputTable'),
 ]

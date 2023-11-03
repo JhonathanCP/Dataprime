@@ -9,6 +9,8 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView
 from core.models import Clasificacion  # Importa el modelo Clasificacion desde core.models
+from rest_framework.views import APIView
+from django.contrib.auth import get_user_model
 
 class UserListView(generics.ListCreateAPIView):
     queryset = CustomUser.objects.all()
@@ -50,7 +52,7 @@ class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAuthenticated]
 
 class UserRegistrationView(generics.CreateAPIView):
-    queryset = CustomUser.objects.all()
+    queryset = get_user_model().objects.all()
     serializer_class = UserRegistrationSerializer
     permission_classes = [AllowAny]
 
@@ -58,19 +60,21 @@ class UserRegistrationView(generics.CreateAPIView):
         username = serializer.validated_data.get('username')
         email = serializer.validated_data.get('email')
 
-        existing_user = CustomUser.objects.filter(username=username).first()
+        existing_user = get_user_model().objects.filter(username=username).first()
+        existing_email = get_user_model().objects.filter(email=email).first()
+
         if existing_user:
             return Response({"message": "Username already exists."}, status=status.HTTP_400_BAD_REQUEST)
-
-        existing_email = CustomUser.objects.filter(email=email).first()
         if existing_email:
             return Response({"message": "Email already exists."}, status=status.HTTP_400_BAD_REQUEST)
 
         user = serializer.save()
         self._register_activity(user, f"User registered with '{user.role}' role")
+        return Response({"message": "User registered successfully."}, status=status.HTTP_201_CREATED)
 
     def _register_activity(self, user, action):
         UserActivity.objects.create(user=user, action=action)
+
 
 class UserUpdateRoleView(generics.UpdateAPIView):
     queryset = CustomUser.objects.all()
@@ -96,3 +100,17 @@ class UserUpdateRoleView(generics.UpdateAPIView):
 
     def _register_activity(self, user, action):
         UserActivity.objects.create(user=user, action=action)
+
+class UserAddClasificacion(APIView):
+    def post(self, request, user_id, clasificacion_id):
+        try:
+            user = CustomUser.objects.get(id=user_id)
+            clasificacion = Clasificacion.objects.get(id=clasificacion_id)
+        except CustomUser.DoesNotExist:
+            return Response({"message": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+        except Clasificacion.DoesNotExist:
+            return Response({"message": "Clasificacion not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        user.clasificaciones.add(clasificacion)
+        user.save()
+        return Response({"message": "Clasificacion added to user successfully."}, status=status.HTTP_200_OK)
